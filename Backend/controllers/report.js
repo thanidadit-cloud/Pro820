@@ -1,17 +1,23 @@
 const db = require('../config/db');
 
-exports.getDailyReport = async (res) => {
-    const [rows] = await db.query(`
-        SELECT DATE_FORMAT(log_date, '%Y-%m-%d') AS date, type, CAST(SUM(amount) AS UNSIGNED) AS total 
-        FROM stock_logs GROUP BY date, type ORDER BY date DESC
-    `);
-    res.end(JSON.stringify(rows));
-};
+exports.login = async (res, data) => {
+    const { username, password } = data;
+    try {
+        // เช็คว่ามี user นี้และรหัสตรงกันไหม
+        const [rows] = await db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
 
-exports.getMonthlyReport = async (res) => {
-    const [rows] = await db.query(`
-        SELECT DATE_FORMAT(log_date, '%Y-%m') AS date, type, CAST(SUM(amount) AS UNSIGNED) AS total 
-        FROM stock_logs GROUP BY date, type ORDER BY date DESC
-    `);
-    res.end(JSON.stringify(rows));
+        if (rows.length > 0) {
+            res.end(JSON.stringify({ 
+                status: "success", 
+                message: "เข้าสู่ระบบสำเร็จ", 
+                user: { name: rows[0].fullname } 
+            }));
+        } else {
+            res.writeHead(401); // Unauthorized
+            res.end(JSON.stringify({ status: "error", message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" }));
+        }
+    } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ status: "error", message: err.message }));
+    }
 };
