@@ -1,4 +1,4 @@
-// กำหนด URL ของ Backend
+// กำหนด URL ของ Backend (ตรวจสอบให้ตรงกับที่ Run Server ไว้)
 const API = 'http://localhost:3000';
 
 // --- 1. ฟังก์ชันจัดการ Login ---
@@ -11,9 +11,11 @@ async function handleLogin() {
     try {
         // ส่งข้อมูลไปเช็คที่ Backend
         const res = await axios.post(`${API}/login`, { username, password });
-        alert(`ยินดีต้อนรับคุณ ${res.data.user.fullname || res.data.user.name}`);
         
-        // เมื่อ Login สำเร็จ: ซ่อนหน้า Login และแสดงหน้าแอปหลัก
+        // แสดงชื่อผู้ใช้จากข้อมูลที่ส่งกลับมา
+        alert(`ยินดีต้อนรับคุณ ${res.data.user.name}`);
+        
+        // เมื่อ Login สำเร็จ: สลับหน้าจอ
         document.getElementById('section-login').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
         
@@ -32,35 +34,45 @@ function handleLogout() {
         document.getElementById('loginUser').value = '';
         document.getElementById('loginPass').value = '';
         
-        // สลับหน้าจอกลับไปที่หน้า Login และซ่อนแอปหลัก
+        // สลับหน้าจอกลับไปที่หน้า Login
         document.getElementById('section-login').classList.remove('hidden');
         document.getElementById('main-app').classList.add('hidden');
     }
 }
 
-// --- 3. ฟังก์ชันสลับหน้าจอภายในแอป (UI Logic) ---
+// --- 3. ฟังก์ชันสลับหน้าจอ (UI Logic) ---
 function showSection(id) {
-    // ซ่อนเนื้อหาทุกส่วนที่มีคลาส .section-content ก่อน
+    // ซ่อนเนื้อหาทุกส่วนก่อน
     document.querySelectorAll('.section-content').forEach(s => {
         s.style.display = 'none';
     });
     
-    // แสดงส่วนที่เลือกโดยใช้ ID
-    const element = document.getElementById(id);
+    let targetId = id;
+    if (id === 'dashboard') targetId = 'section-dashboard';
+
+    const element = document.getElementById(targetId);
     if (element) {
         element.style.display = 'block';
+    } else {
+        // ป้องกันหน้าจอว่าง
+        const dash = document.getElementById('section-dashboard');
+        if (dash) dash.style.display = 'block';
     }
 
-    // Auto-load ข้อมูลอัตโนมัติเมื่อเข้าแต่ละหน้า
-    if (id === 'section-list') loadAllProducts();
-    if (id === 'section-low') loadLowStock();
-    if (id === 'section-report') document.getElementById('reportDisplay').innerHTML = '';
+    //โหลดข้อมูลอัตโนมัติเมื่อเข้าแต่ละหน้า
+    if (targetId === 'section-list') loadAllProducts();
+    if (targetId === 'section-low') loadLowStock();
+    if (targetId === 'section-report') {
+        document.getElementById('reportDisplay').innerHTML = '<p style="text-align:center; color:#888; margin-top:20px;">กรุณากดปุ่มด้านบนเพื่อดูรายงาน</p>';
+    }
 }
 
-// เมื่อโหลดหน้าเว็บครั้งแรก (กั้นไว้ที่หน้า Login)
+// เมื่อโหลดหน้าเว็บครั้งแรก
 window.onload = () => {
-    document.getElementById('section-login').classList.remove('hidden');
-    document.getElementById('main-app').classList.add('hidden');
+    const loginSec = document.getElementById('section-login');
+    const appSec = document.getElementById('main-app');
+    if(loginSec) loginSec.classList.remove('hidden');
+    if(appSec) appSec.classList.add('hidden');
 };
 
 // --- 4. ฟังก์ชัน API: ดึงข้อมูลสินค้าทั้งหมด ---
@@ -92,11 +104,9 @@ async function addProduct() {
         await axios.post(`${API}/add-product`, { name, quantity, min_stock: 5 });
         alert("เพิ่มสินค้าเรียบร้อย!");
         
-        // ล้างค่าในช่องกรอก
         document.getElementById('newName').value = '';
         document.getElementById('newQty').value = '';
         
-        // กลับไปหน้าแสดงรายการ
         showSection('section-list');
     } catch (error) { 
         alert("เกิดข้อผิดพลาดในการบันทึก"); 
@@ -141,7 +151,7 @@ async function loadLowStock() {
     }
 }
 
-// --- 8. ฟังก์ชัน API: สรุปรายงาน ---
+// --- 8. ฟังก์ชัน API: สรุปรายงาน (ฉบับปรับปรุงรูปแบบวันที่ให้เหมือน Studio 7) ---
 async function loadReport(mode) {
     const path = mode === 'daily' ? '/report-daily' : '/report-monthly';
     try {
@@ -154,7 +164,26 @@ async function loadReport(mode) {
         let html = `<table><tr><th>${mode === 'daily' ? 'วันที่' : 'เดือน'}</th><th>ประเภท</th><th>ยอดรวม</th></tr>`;
         
         res.data.forEach(item => {
-            html += `<tr><td>${item.date || item.month || 'ไม่ระบุ'}</td><td>${item.type}</td><td><strong>${item.total}</strong></td></tr>`;
+            let rawValue = item.date || item.month || 'ไม่ระบุ';
+            let displayValue = rawValue;
+
+            // แปลงรูปแบบวันที่ ISO String ให้เป็นแบบไทย
+            if (mode === 'daily' && rawValue !== 'ไม่ระบุ') {
+                displayValue = new Date(rawValue).toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            // แยกสีตามประเภทสินค้าเข้า-ออก
+            const typeStyle = item.type === 'IN' ? 'color: #28a745; font-weight: bold;' : 'color: #dc3545; font-weight: bold;';
+
+            html += `<tr>
+                <td>${displayValue}</td>
+                <td style="${typeStyle}">${item.type}</td>
+                <td><strong>${item.total}</strong></td>
+            </tr>`;
         });
         
         html += '</table>';
