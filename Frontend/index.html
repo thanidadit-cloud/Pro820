@@ -3,27 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการสต็อกสินค้า</title>
+    <title>ระบบจัดการสต็อกสินค้า | Stock Management System</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="container">
         
-        <div id="section-login" class="card login-container">
-            <h2 class="text-center">Login เข้าสู่ระบบ</h2>
+        <section id="section-login" class="card login-container">
+            <h2 class="text-center">STOCK SYSTEM</h2>
+            <p class="login-subtitle">กรุณาเข้าสู่ระบบเพื่อจัดการคลังสินค้า</p>
             <div class="input-group-vertical">
-                <input type="text" id="loginUser" placeholder="ชื่อผู้ใช้งาน">
-                <input type="password" id="loginPass" placeholder="รหัสผ่าน">
-                <button class="btn btn-blue" onclick="handleLogin()">เข้าสู่ระบบ</button>
+                <input type="text" id="loginUser" placeholder="ชื่อผู้ใช้งาน (Username)">
+                <input type="password" id="loginPass" placeholder="รหัสผ่าน (Password)">
+                <button class="btn btn-blue" onclick="doLogin()">เข้าสู่ระบบ</button>
             </div>
-            <p class="footer-tag">โปรเจกต์ระบบจัดการสินค้าคงคลัง</p>
-        </div>
+            <div id="login-error" class="error-text"></div>
+        </section>
 
-        <div id="main-app" class="hidden">
+        <main id="main-app" class="hidden">
+            
             <header class="main-header">
-                <h1 onclick="showSection('dashboard')" class="logo">STOCK SYSTEM</h1>
-                <button onclick="handleLogout()" class="btn-logout">ออกจากระบบ</button>
+                <h1 onclick="showSection('dashboard')" class="logo">STOCK SYSTEM</h1> 
+                
+                <div id="welcome-banner">
+                    <span class="user-label">ผู้ใช้งาน:</span>
+                    <span id="displayUserName">กำลังโหลด...</span>
+                    <button onclick="handleLogout()" class="btn-logout">ออกจากระบบ</button>
+                </div>
             </header>
 
             <nav class="top-navbar">
@@ -37,6 +45,7 @@
             </nav>
 
             <div class="content-body">
+                
                 <div id="section-dashboard" class="section-content">
                     <div class="dashboard-grid">
                         <div class="dash-card" onclick="showSection('section-list')">
@@ -61,20 +70,23 @@
                 <div id="section-list" class="card section-content">
                     <div class="header-flex">
                         <h2>รายการสินค้าทั้งหมด</h2>
+                        <button class="btn btn-blue btn-inline" onclick="showSection('section-add')">+ เพิ่มสินค้าใหม่</button>
                     </div>
-                    <button class="btn btn-blue btn-add-new" onclick="showSection('section-add')">+ เพิ่มสินค้าใหม่</button>
-                    <div id="allProductsDisplay"></div>
+                    <div id="allProductsDisplay" class="table-responsive"></div>
                 </div>
 
                 <div id="section-add" class="card section-content">
                     <div class="header-flex">
                         <h2>เพิ่มสินค้าใหม่</h2>
-                        <button class="btn-back" onclick="showSection('section-list')">⬅ ย้อนกลับ</button>
+                        <button class="btn-back" onclick="showSection('section-list')">ย้อนกลับ</button>
                     </div>
-                    <div class="input-group-vertical">
-                        <input type="text" id="newName" placeholder="ชื่อสินค้า">
-                        <input type="number" id="newQty" min="1" placeholder="จำนวนเริ่มต้น">
-                        <button class="btn btn-blue" id="addBtn" onclick="addProduct()">บันทึกสินค้าใหม่</button>
+                    <div class="form-container">
+                        <label>ชื่อสินค้า</label>
+                        <input type="text" id="newName" placeholder="ระบุชื่อสินค้า">
+                        <label>จำนวนเริ่มต้น</label>
+                        <input type="number" id="newQty" min="1" oninput="if(this.value<1 && this.value!='') this.value='';" placeholder="ระบุจำนวน">
+                        <button class="btn btn-blue" onclick="addProduct()">บันทึกสินค้าใหม่</button>
+                        <div id="add-error" class="error-text"></div>
                     </div>
                 </div>
 
@@ -82,36 +94,68 @@
                     <div class="header-flex">
                         <h2>บันทึก การนำเข้า - จ่ายออก</h2>
                     </div>
-                    <div class="input-group-vertical">
-                        <input type="number" id="logId" min="1" placeholder="ใส่ ID สินค้า">
+                    <div class="form-container">
+                        <label>ID สินค้า</label>
+                        <input type="number" id="logId" min="1" oninput="if(this.value<1 && this.value!='') this.value='';" placeholder="ใส่ ID สินค้า (ต้องมากกว่า 0)">
+                        
+                        <label>ประเภทรายการ</label>
                         <select id="logType">
                             <option value="IN">นำเข้า (IN)</option>
                             <option value="OUT">จ่ายออก (OUT)</option>
                         </select>
-                        <input type="number" id="logAmount" min="1" placeholder="จำนวน">
-                        <button class="btn btn-green" id="updateBtn" onclick="updateStock()">บันทึกรายการ</button>
+                        
+                        <label>จำนวน</label>
+                        <input type="number" id="logAmount" min="1" oninput="if(this.value<1 && this.value!='') this.value='';" placeholder="ใส่จำนวนที่ต้องการ">
+                        
+                        <button class="btn btn-green" onclick="updateStock()">บันทึกรายการ</button>
+                        
+                        <div id="update-error" class="error-text"></div>
                     </div>
                 </div>
 
                 <div id="section-low" class="card section-content">
                     <div class="header-flex">
                         <h2>สินค้าใกล้หมด</h2>
+                        <button class="btn btn-blue btn-inline" onclick="loadLowStock()">อัปเดตข้อมูล</button>
                     </div>
-                    <button class="btn btn-blue btn-update-info" onclick="loadLowStock()">อัปเดตข้อมูล</button>
                     <div id="lowStockDisplay"></div>
                 </div>
 
                 <div id="section-report" class="card section-content">
-                    <div class="header-flex">
+                    <div class="report-header">
                         <h2>รายงานสรุปยอด</h2>
+                        <div class="report-tabs">
+                            <button id="btn-daily" class="tab-btn active" onclick="loadReport('daily')">รายวัน</button>
+                            <button id="btn-monthly" class="tab-btn" onclick="loadReport('monthly')">รายเดือน</button>
+                        </div>
                     </div>
-                    <div class="report-menu-stack">
-                        <button class="btn-report-action btn-daily-color" onclick="loadReport('daily')">รายงานสรุปรายวัน</button>
-                        <button class="btn-report-action btn-monthly-color" onclick="loadReport('monthly')">รายงานสรุปรายเดือน</button>
-                    </div>
-                    <div id="reportDisplay"></div>
+                    <div id="reportDisplay" class="report-container"></div>
                 </div>
-            </div> </div> </div>
-    <script src="script.js"></script>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="Js/api.js"></script>
+    <script src="Js/ui.js"></script>
+    <script src="Js/product.js"></script>
+    <script src="Js/report.js"></script>
+
+    <script>
+        window.onload = () => {
+            const savedUser = localStorage.getItem('userName');
+            if(savedUser) {
+                document.getElementById('section-login').style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('displayUserName').innerText = savedUser;
+                showSection('dashboard');
+            }
+        };
+
+        function handleLogout() {
+            localStorage.removeItem('userName');
+            location.reload();
+        }
+    </script>
 </body>
 </html>

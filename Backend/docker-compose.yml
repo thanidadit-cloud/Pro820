@@ -11,7 +11,7 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - weblab820
-    # แนะนำเพิ่ม restart policy เพื่อให้ DB รันขึ้นมาใหม่ถ้าเครื่องดับ
+    
     restart: always 
 
   phpmyadmin:
