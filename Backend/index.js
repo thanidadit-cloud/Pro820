@@ -1,7 +1,6 @@
 const http = require('http');
 const url = require('url');
 const apiRoutes = require('./routes/api');
-// สมมติว่าไฟล์ db.js ของคุณส่งออกฟังก์ชันสำหรับเชื่อมต่อฐานข้อมูล
 const { initDB } = require('./config/db'); 
 
 const getBody = (req) => new Promise((resolve) => {
@@ -11,7 +10,7 @@ const getBody = (req) => new Promise((resolve) => {
         try {
             resolve(body ? JSON.parse(body) : {});
         } catch (e) {
-            resolve({}); // ป้องกัน Error ถ้าส่ง JSON มาผิดรูปแบบ
+            resolve({}); 
         }
     });
 });
@@ -19,7 +18,7 @@ const getBody = (req) => new Promise((resolve) => {
 const server = http.createServer(async (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     
-    // ตั้งค่า CORS
+
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -40,11 +39,9 @@ const server = http.createServer(async (req, res) => {
     }
 });
 
-// ฟังก์ชันสำหรับเริ่มต้นระบบ (เหมือนแบบที่คุณอยากได้)
 const startServer = async () => {
     try {
         console.log('Connecting to database...');
-        // เรียกใช้ฟังก์ชันเชื่อมต่อ DB (ถ้าใน db.js ของคุณชื่ออื่น ให้เปลี่ยนตามนะครับ)
         const PORT = 8000;
         server.listen(PORT, () => {
             console.log(` Server is running at http://localhost:${PORT}`);

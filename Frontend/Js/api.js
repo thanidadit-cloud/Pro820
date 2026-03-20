@@ -21,30 +21,28 @@ async function doLogin() {
         
         if (response.data && response.data.success === true) {
             
-            // 1. เก็บชื่อและแสดงผลที่มุมขวาบน
+            
             localStorage.setItem('userName', response.data.name);
             const displayEl = document.getElementById('displayUserName');
             if (displayEl) displayEl.innerText = response.data.name;
 
-            // 2. สลับหน้าจอ (ซ่อน Login โชว์หน้าหลัก)
+            
             document.getElementById('section-login').style.display = 'none';
             document.getElementById('main-app').classList.remove('hidden');
             
-            // 3. เรียกฟังก์ชัน UI เพื่อโหลดหน้า Dashboard
+        
             if (typeof showSection === 'function') {
                 showSection('dashboard');
             }
 
-            // ล้างช่องกรอกข้อมูล
             userField.value = "";
             passField.value = "";
 
         } else {
-            // ถ้ากรอกผิด แต่ Backend ยังตอบกลับมาได้
             errorDisplay.innerText = (response.data.message || "ข้อมูลไม่ถูกต้อง");
         }
     } catch (error) {
-        // กรณี Server ปิดอยู่ หรือ Network มีปัญหา
+        
         if (error.response && error.response.data) {
             errorDisplay.innerText = error.response.data.message;
         } else {

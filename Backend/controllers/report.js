@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// ฟังก์ชันสำหรับรายงานรายวัน
+
 exports.getDailyReport = async (res) => {
     try {
         const [rows] = await db.query(`
@@ -17,7 +17,7 @@ exports.getDailyReport = async (res) => {
     }
 };
 
-// ฟังก์ชันสำหรับรายงานรายเดือน
+
 exports.getMonthlyReport = async (res) => {
     try {
         const [rows] = await db.query(`

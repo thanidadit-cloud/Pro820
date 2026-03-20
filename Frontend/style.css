@@ -264,9 +264,14 @@ tr:hover {
     background-color: #fcfcfc;
 }
 
+/* ปรับปรุงส่วนแสดงสินค้าใกล้หมดให้แดงชัดเจน */
 .low-stock { 
     background-color: #fff1f2 !important; 
-    color: #991b1b; 
+}
+
+.low-stock td {
+    color: #dc2626 !important; 
+    font-weight: 700 !important;
 }
 
 /* --- 10. ส่วนของรายงาน & Tabs --- */
