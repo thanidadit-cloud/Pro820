@@ -1,161 +1,96 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการสต็อกสินค้า | Stock Management System</title>
+    <title>ระบบจัดการสินค้า - Thanida</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </head>
+
 <body>
     <div class="container">
-        
-        <section id="section-login" class="card login-container">
-            <h2 class="text-center">STOCK SYSTEM</h2>
-            <p class="login-subtitle">กรุณาเข้าสู่ระบบเพื่อจัดการคลังสินค้า</p>
-            <div class="input-group-vertical">
-                <input type="text" id="loginUser" placeholder="ชื่อผู้ใช้งาน (Username)">
-                <input type="password" id="loginPass" placeholder="รหัสผ่าน (Password)">
-                <button class="btn btn-blue" onclick="doLogin()">เข้าสู่ระบบ</button>
-            </div>
-            <div id="login-error" class="error-text"></div>
-        </section>
-
-        <main id="main-app" class="hidden">
-            
+        <main id="main-app">
             <header class="main-header">
-                <h1 onclick="showSection('dashboard')" class="logo">STOCK SYSTEM</h1> 
-                
+                <h1 onclick="showSection('section-dashboard')" style="cursor:pointer">ระบบจัดการสต็อกสินค้า</h1>
                 <div id="welcome-banner">
-                    <span class="user-label">ผู้ใช้งาน:</span>
-                    <span id="displayUserName">กำลังโหลด...</span>
-                    <button onclick="handleLogout()" class="btn-logout">ออกจากระบบ</button>
+                    <span>สถานะ: </span>
+                    <span id="displayUserName">ผู้ดูแลระบบ</span>
+                    <button onclick="location.reload()" class="btn-logout">รีเฟรชหน้าจอ</button>
                 </div>
             </header>
 
             <nav class="top-navbar">
                 <ul>
-                    <li onclick="showSection('dashboard')">หน้าหลัก</li>
+                    <li onclick="showSection('section-dashboard')">หน้าหลัก</li>
                     <li onclick="showSection('section-list')">รายการสินค้า</li>
-                    <li onclick="showSection('section-update')">จัดการเข้า-ออก</li>
+                    <li onclick="showSection('section-update')">นำเข้า/จ่ายออก</li>
                     <li onclick="showSection('section-low')">สินค้าใกล้หมด</li>
-                    <li onclick="showSection('section-report')">รายงานสรุป</li>
                 </ul>
             </nav>
 
             <div class="content-body">
-                
                 <div id="section-dashboard" class="section-content">
                     <div class="dashboard-grid">
                         <div class="dash-card" onclick="showSection('section-list')">
                             <h3>รายการสินค้า</h3>
-                            <p>ดูสต็อกและเช็ค ID</p>
+                            <p>ดูสต็อกทั้งหมดในคลัง</p>
                         </div>
                         <div class="dash-card" onclick="showSection('section-update')">
-                            <h3>จัดการเข้า-ออก</h3>
-                            <p>บันทึกนำเข้า/จ่ายออก</p>
-                        </div>
-                        <div class="dash-card" onclick="showSection('section-low')">
-                            <h3>สินค้าใกล้หมด</h3>
-                            <p>ตรวจสอบจุดวิกฤต</p>
-                        </div>
-                        <div class="dash-card" onclick="showSection('section-report')">
-                            <h3>รายงานสรุป</h3>
-                            <p>สรุปยอดรายวัน/เดือน</p>
+                            <h3>จัดการสต็อก</h3>
+                            <p>บันทึกการนำเข้า/เบิกจ่าย</p>
                         </div>
                     </div>
                 </div>
 
                 <div id="section-list" class="card section-content">
-                    <div class="header-flex">
-                        <h2>รายการสินค้าทั้งหมด</h2>
-                        <button class="btn btn-blue btn-inline" onclick="showSection('section-add')">+ เพิ่มสินค้าใหม่</button>
+                    <div class="header-flex" style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2>สต็อกสินค้าทั้งหมด</h2>
+                        <button class="btn btn-blue" onclick="showSection('section-add')">+ เพิ่มสินค้าใหม่</button>
                     </div>
-                    <div id="allProductsDisplay" class="table-responsive"></div>
+                    <div id="allProductsDisplay"></div>
                 </div>
 
                 <div id="section-add" class="card section-content">
-                    <div class="header-flex">
-                        <h2>เพิ่มสินค้าใหม่</h2>
-                        <button class="btn-back" onclick="showSection('section-list')">ย้อนกลับ</button>
-                    </div>
+                    <h2>เพิ่มสินค้าใหม่เข้าสู่ระบบ</h2>
                     <div class="form-container">
                         <label>ชื่อสินค้า</label>
                         <input type="text" id="newName" placeholder="ระบุชื่อสินค้า">
                         <label>จำนวนเริ่มต้น</label>
-                        <input type="number" id="newQty" min="1" oninput="if(this.value<1 && this.value!='') this.value='';" placeholder="ระบุจำนวน">
-                        <button class="btn btn-blue" onclick="addProduct()">บันทึกสินค้าใหม่</button>
-                        <div id="add-error" class="error-text"></div>
+                        <input type="number" id="newQty" placeholder="ระบุจำนวน">
+                        <button class="btn btn-blue" onclick="addProduct()">บันทึกข้อมูล</button>
+                        <button class="btn-back" onclick="showSection('section-list')">ยกเลิก</button>
                     </div>
                 </div>
 
                 <div id="section-update" class="card section-content">
-                    <div class="header-flex">
-                        <h2>บันทึก การนำเข้า - จ่ายออก</h2>
-                    </div>
+                    <h2>บันทึกความเคลื่อนไหวสต็อก</h2>
                     <div class="form-container">
                         <label>ID สินค้า</label>
-                        <input type="number" id="logId" min="1" oninput="if(this.value<1 && this.value!='') this.value='';" placeholder="ใส่ ID สินค้า (ต้องมากกว่า 0)">
-                        
+                        <input type="number" id="logId" placeholder="ระบุ ID สินค้า">
                         <label>ประเภทรายการ</label>
                         <select id="logType">
-                            <option value="IN">นำเข้า (IN)</option>
-                            <option value="OUT">จ่ายออก (OUT)</option>
+                            <option value="IN">นำเข้า (Stock In)</option>
+                            <option value="OUT">จ่ายออก (Stock Out)</option>
                         </select>
-                        
                         <label>จำนวน</label>
-                        <input type="number" id="logAmount" min="1" oninput="if(this.value<1 && this.value!='') this.value='';" placeholder="ใส่จำนวนที่ต้องการ">
-                        
+                        <input type="number" id="logAmount" placeholder="ระบุจำนวน">
                         <button class="btn btn-green" onclick="updateStock()">บันทึกรายการ</button>
-                        
-                        <div id="update-error" class="error-text"></div>
                     </div>
                 </div>
 
                 <div id="section-low" class="card section-content">
-                    <div class="header-flex">
-                        <h2>สินค้าใกล้หมด</h2>
-                        <button class="btn btn-blue btn-inline" onclick="loadLowStock()">อัปเดตข้อมูล</button>
-                    </div>
+                    <h2>แจ้งเตือน: สินค้าใกล้หมด</h2>
                     <div id="lowStockDisplay"></div>
                 </div>
-
-                <div id="section-report" class="card section-content">
-                    <div class="report-header">
-                        <h2>รายงานสรุปยอด</h2>
-                        <div class="report-tabs">
-                            <button id="btn-daily" class="tab-btn active" onclick="loadReport('daily')">รายวัน</button>
-                            <button id="btn-monthly" class="tab-btn" onclick="loadReport('monthly')">รายเดือน</button>
-                        </div>
-                    </div>
-                    <div id="reportDisplay" class="report-container"></div>
-                </div>
-
             </div>
         </main>
     </div>
-
-    <script src="Js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="Js/ui.js"></script>
     <script src="Js/product.js"></script>
-    <script src="Js/report.js"></script>
-
-    <script>
-        window.onload = () => {
-            const savedUser = localStorage.getItem('userName');
-            if(savedUser) {
-                document.getElementById('section-login').style.display = 'none';
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('displayUserName').innerText = savedUser;
-                showSection('dashboard');
-            }
-        };
-
-        function handleLogout() {
-            localStorage.removeItem('userName');
-            location.reload();
-        }
-    </script>
 </body>
+
 </html>

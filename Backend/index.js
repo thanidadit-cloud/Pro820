@@ -9,7 +9,7 @@ const getBody = (req) => new Promise((resolve) => {
     req.on('end', () => {
         try {
             resolve(body ? JSON.parse(body) : {});
-        } catch (e) {
+        } catch {
             resolve({}); 
         }
     });
@@ -41,7 +41,6 @@ const server = http.createServer(async (req, res) => {
 
 const startServer = async () => {
     try {
-        console.log('Connecting to database...');
         const PORT = 8000;
         server.listen(PORT, () => {
             console.log(` Server is running at http://localhost:${PORT}`);

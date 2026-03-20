@@ -1,6 +1,4 @@
 const db = require('../config/db');
-
-
 exports.getDailyReport = async (res) => {
     try {
         const [rows] = await db.query(`

@@ -46,7 +46,7 @@ async function doLogin() {
         if (error.response && error.response.data) {
             errorDisplay.innerText = error.response.data.message;
         } else {
-            errorDisplay.innerText = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (เปิด Backend หรือยัง?)";
+            errorDisplay.innerText = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
         }
     }
 }
