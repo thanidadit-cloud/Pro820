@@ -1,7 +1,7 @@
 const http = require('http');
 const url = require('url');
 const apiRoutes = require('./routes/api');
-const { initDB } = require('./config/db'); 
+const db = require('./config/db'); 
 
 const getBody = (req) => new Promise((resolve) => {
     let body = '';
@@ -10,24 +10,23 @@ const getBody = (req) => new Promise((resolve) => {
         try {
             resolve(body ? JSON.parse(body) : {});
         } catch {
-            resolve({}); 
+            resolve({});
         }
     });
 });
 
 const server = http.createServer(async (req, res) => {
     const parsedUrl = url.parse(req.url, true);
-    
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') { 
-        res.writeHead(204); 
-        res.end(); 
-        return; 
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
     }
 
     try {
@@ -41,13 +40,14 @@ const server = http.createServer(async (req, res) => {
 
 const startServer = async () => {
     try {
+        await db.initDB(); 
         const PORT = 8000;
         server.listen(PORT, () => {
-            console.log(` Server is running at http://localhost:${PORT}`);
+            console.log(`Server is running at http://localhost:${PORT}`);
         });
     } catch (error) {
-        console.error(' Could not start server:', error.message);
-        process.exit(1); 
+        console.error('Could not start server:', error.message);
+        process.exit(1);
     }
 };
 

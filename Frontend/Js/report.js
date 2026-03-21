@@ -39,7 +39,7 @@ function loadReport(mode) {
                 table = table + '<tr>';
                 table = table + '<td>' + display + '</td>';
                 table = table + '<td>' + item.type + '</td>';
-                table = table + '<td>' + item.total + '</td>'; // แสดงเลขดิบๆ ไม่ต้องใส่คอมม่า
+                table = table + '<td>' + item.total + '</td>';
                 table = table + '</tr>';
             }
             table = table + '</table>';

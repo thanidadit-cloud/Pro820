@@ -44,7 +44,7 @@ async function addProduct() {
             min_stock: 5
         });
 
-        alert("เพิ่มเสร็จแล้ว"); 
+        alert("เพิ่มสำเร็จ"); 
         
         
         document.getElementById('newName').value = "";
@@ -66,7 +66,6 @@ function updateStock() {
         type: t,
         amount: a
     }).then(res => {
-        // เช็คเงื่อนไขแบบบ้านๆ
         if(res.data.lowStockAlert == true) {
             document.getElementById('update-error').innerHTML = "เตือน: ของเหลือแค่ " + res.data.currentQuantity;
             document.getElementById('update-error').style.color = "red";

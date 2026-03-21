@@ -1,6 +1,6 @@
 const product = require('../controllers/product');
 const report = require('../controllers/report');
-const auth = require('../controllers/usernamejs');
+const auth = require('../controllers/username');  
 
 module.exports = function(path, method, req, res, bodyData) {
     
@@ -10,27 +10,23 @@ module.exports = function(path, method, req, res, bodyData) {
         }
     } 
     
-    
     else if (path == '/all-products') {
         if (method == 'GET') {
             product.getAllProducts(res);
         }
     } 
     
-   
     else if (path == '/low-stock') {
         if (method == 'GET') {
             product.getLowStock(res);
         }
     }
 
-
     else if (path == '/report-daily') {
         if (method == 'GET') {
             report.getDailyReport(res);
         }
     }
-
 
     else if (path == '/report-monthly') {
         if (method == 'GET') {
@@ -44,13 +40,11 @@ module.exports = function(path, method, req, res, bodyData) {
         }
     }
 
-
     else if (path == '/update-stock') {
         if (method == 'POST') {
             product.updateStock(res, bodyData);
         }
     }
-
 
     else {
         res.writeHead(404);

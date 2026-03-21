@@ -14,7 +14,6 @@ db.initDB = async () => {
     try {
         const connection = await db.getConnection();
         console.log(' MySQL Database connected successfully');
-        connection.release();
     } catch (err) {
         console.error(' Database connection failed:', err.message);
         throw err;
